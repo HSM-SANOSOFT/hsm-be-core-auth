@@ -8,7 +8,7 @@ import {
 import { envs } from 'config';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway(envs.AUTH_MICROSERVICE_PORT, { cors: true })
+@WebSocketGateway()
 export class Websocket implements OnGatewayConnection, OnGatewayDisconnect {
   logger = new Logger('AUTH WEBSOCKET');
   @WebSocketServer()
