@@ -45,5 +45,8 @@ jobs:
               echo "docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest"
               docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest
 
+              # Capitalize MICROSERVICE_NAME
+              CAPS_MICROSERVICE_NAME=$(echo "${{ vars.MICROSERVICE_NAME }}" | tr '[:lower:]' '[:upper:]')
+
               echo "Restarting ${{vars.MICROSERVICE_NAME}} container..."
-              docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps ${{vars.MICROSERVICE_NAME}}
+              docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps $CAPS_MICROSERVICE_NAME
