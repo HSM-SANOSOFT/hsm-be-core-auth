@@ -4,6 +4,7 @@ import type { MicroserviceOptions } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 
 import { envs } from '../config';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
