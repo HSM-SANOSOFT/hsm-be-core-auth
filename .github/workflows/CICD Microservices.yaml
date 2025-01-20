@@ -12,5 +12,5 @@ jobs:
           - name: Pull and Deploy Microservices
             run: |
               # Capitalize MICROSERVICE_NAME
-              $CAPS_MICROSERVICE_NAME = ${{vars.MICROSERVICE_NAME}}.ToUpper()
+              $CAPS_MICROSERVICE_NAME = $vars.MICROSERVICE_NAME.ToUpper()
               echo "Restarting $CAPS_MICROSERVICE_NAME container..."
