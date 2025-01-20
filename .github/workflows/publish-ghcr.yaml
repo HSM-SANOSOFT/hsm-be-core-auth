@@ -29,3 +29,19 @@ jobs:
             file: ./Dockerfile
             push: true
             tags: ghcr.io/hsm-sanosoft/${{vars.AUTH_MICROSERVICE_NAME}}:latest
+    deploy:
+        runs-on: self-hosted
+
+        steps:
+            - name: Pull and Deploy Microservices
+              env:
+                SERVICE_NAME: HSM-BE-AUTH-MS
+              run: |
+                echo "Navigating to directory: ${{secrets.PATH_DOCKER_COMPOSE}}"
+                cd ${{secrets.PATH_DOCKER_COMPOSE}}
+
+                echo "Pulling the latest image for $SERVICE_NAME..."
+                docker pull ghcr.io/hsm-sanosoft/$SERVICE_NAME:latest
+
+                echo "Restarting $SERVICE_NAME container..."
+                docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps $SERVICE_NAME
