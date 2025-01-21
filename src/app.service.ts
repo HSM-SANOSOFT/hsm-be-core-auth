@@ -41,7 +41,7 @@ export class AppService {
   };
 
   InitMS() {
-    return 'Microservice is up and running !';
+    return 'Microservice is up and running!';
   }
 
   async login(authLoginDto: AuthLoginDto) {
