@@ -7,11 +7,12 @@ on:
 
 jobs:
     deploy:
-        runs-on: self-hosted
-        steps:
-          - name: Pull and Deploy Microservices
-            uses: ASzc/change-string-case-action@v1
-            with: 
-              string: ${{ vars.MICROSERVICE_NAME }}
-          - run: |
+      name: Pull and Deploy Microservices
+      runs-on: self-hosted
+      steps:
+        - id: string
+          uses: ASzc/change-string-case-action@v6
+          with: 
+            string: ${{ vars.MICROSERVICE_NAME }}
+        - run: |
               echo "${{steps.string.outputs.uppercase}}"
