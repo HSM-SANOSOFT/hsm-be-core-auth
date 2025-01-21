@@ -53,5 +53,6 @@ jobs:
         with: 
           string: ${{ vars.MICROSERVICE_NAME }}
       - run: |
-            echo "Restarting ${{steps.string.outputs.uppercase}} container..."
-            docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps ${{steps.string.outputs.uppercase}}
+          cd ${{secrets.PATH_DOCKER_COMPOSE}}
+          echo "Restarting ${{steps.string.outputs.uppercase}} container..."
+          docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps ${{steps.string.outputs.uppercase}}
