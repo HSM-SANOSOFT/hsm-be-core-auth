@@ -38,13 +38,13 @@ jobs:
           username: rsantamaria01
           password: ${{ secrets.GHCR_PASSWORD }}
 
-      - name: Deploy Microservices
+      - name: Capitalize Microservices Name
         id: string
         uses: ASzc/change-string-case-action@v6
         with: 
           string: ${{ vars.MICROSERVICE_NAME }}
 
-      - name: Pull Microservices
+      - name: Pull and Deploy Microservices
         run: |
           echo "Navigating to directory: ${{secrets.PATH_DOCKER_COMPOSE}}"
           cd ${{secrets.PATH_DOCKER_COMPOSE}}
@@ -52,6 +52,6 @@ jobs:
           echo "Pulling the latest image for ${{vars.MICROSERVICE_NAME}}..."
           echo "docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest"
           docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest
-          
+
           echo "Restarting ${{steps.string.outputs.uppercase}} container..."
           docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps ${{steps.string.outputs.uppercase}}
