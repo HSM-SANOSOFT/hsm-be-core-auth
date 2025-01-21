@@ -47,7 +47,7 @@ jobs:
           echo "docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest"
           docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest
           
-      - name: Capitalize Microservice Name
+      - name: Deploy Microservices
         id: string
         uses: ASzc/change-string-case-action@v6
         with: 
