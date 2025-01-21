@@ -38,6 +38,12 @@ jobs:
           username: rsantamaria01
           password: ${{ secrets.GHCR_PASSWORD }}
 
+      - name: Deploy Microservices
+        id: string
+        uses: ASzc/change-string-case-action@v6
+        with: 
+          string: ${{ vars.MICROSERVICE_NAME }}
+
       - name: Pull Microservices
         run: |
           echo "Navigating to directory: ${{secrets.PATH_DOCKER_COMPOSE}}"
@@ -47,12 +53,5 @@ jobs:
           echo "docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest"
           docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest
           
-      - name: Deploy Microservices
-        id: string
-        uses: ASzc/change-string-case-action@v6
-        with: 
-          string: ${{ vars.MICROSERVICE_NAME }}
-      - run: |
-          cd ${{secrets.PATH_DOCKER_COMPOSE}}
           echo "Restarting ${{steps.string.outputs.uppercase}} container..."
           docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps ${{steps.string.outputs.uppercase}}
