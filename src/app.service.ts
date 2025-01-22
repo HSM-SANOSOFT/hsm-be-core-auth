@@ -86,7 +86,9 @@ export class AppService {
       const activeToken = await this.databaseService.retriveActiveToken(userId);
       if (activeToken) {
         const decodedToken = this.jwtService.decode(activeToken);
+        console.log('decodedToken',decodedToken)
         const { websocketClient } = decodedToken;
+        console.log('websocketClient',websocketClient)
         await this.databaseService.updateStatus(userId, activeToken);
         this.websocket.logout(websocketClient);
       }
