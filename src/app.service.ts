@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';
 
@@ -52,33 +52,17 @@ export class AppService {
       const isLocked = await this.databaseService.getUserStatus(username);
       if (isLocked !== 0) {
         throw new RpcException({
-          status: 403,
+          status: HttpStatus.FORBIDDEN,
           message:
             'El usuario se encuentra bloqueado. Por favor, ingrese en la opción Desbloquear Usuario o comuníquese con el departamento de soporte técnico para obtener asistencia.',
         });
       }
 
       // Validate password
-      const isPasswordValid = await this.databaseService.getPassword(
-        username,
-        password,
-      );
-      if (!isPasswordValid) {
-        throw new RpcException({
-          status: 400,
-          message: 'Usuario o Contraseña incorrecto.',
-        });
-      }
+      await this.databaseService.getPassword(username, password);
 
       // Retrieve user information
       const user = await this.databaseService.getUsers(username);
-      if (!user) {
-        throw new RpcException({
-          status: 404,
-          message: 'Usuario no encontrado.',
-        });
-      }
-
       const userId = user.USER_ID;
       const userCode = user.CODIGO;
 
@@ -87,10 +71,29 @@ export class AppService {
         await this.databaseService.retriveActiveToken(userId);
       if (activeSesion) {
         const activeToken = activeSesion.TOKEN;
-        const decodedToken = this.jwtService.decode(activeToken);
-        const { websocketClient } = decodedToken;
-        await this.databaseService.updateStatus(userId, activeToken);
-        this.websocket.logout(websocketClient);
+
+        try {
+          const decodedToken = this.jwtService.decode(activeToken);
+          if (!decodedToken || typeof decodedToken !== 'object') {
+            throw new RpcException({
+              status: HttpStatus.BAD_REQUEST,
+              message: 'Token inválido o malformado.',
+            });
+          }
+
+          const { websocketClient } = decodedToken;
+
+          // Update session status
+          await this.databaseService.updateStatus(userId, activeToken);
+
+          // Logout websocket client
+          this.websocket.logout(websocketClient);
+        } catch (error) {
+          throw new RpcException({
+            status: 500,
+            message: `Error al manejar la sesión activa: ${error.message || 'Sin detalles adicionales'}`,
+          });
+        }
       }
 
       // Generate new token
@@ -102,38 +105,22 @@ export class AppService {
       });
 
       // Insert new token
-      const isTokenInserted = await this.databaseService.insertToken(
-        Number(userId),
-        token,
-      );
-      if (!isTokenInserted) {
-        throw new RpcException({
-          status: 500,
-          message:
-            'Ha ocurrido un error al registrar el token. Por favor, intente nuevamente más tarde o comuníquese con el departamento de soporte técnico para obtener asistencia.',
-        });
-      }
+      await this.databaseService.insertToken(Number(userId), token);
 
       // Register user in the system
-      const isProcedureSuccess =
-        await this.databaseService.adm_proc_servidores(userCode);
-      if (!isProcedureSuccess) {
-        throw new RpcException({
-          status: 500,
-          message:
-            'Ha ocurrido un error al registrar el usuario en el turnero. Por favor, intente nuevamente más tarde o comuníquese con el departamento de soporte técnico para obtener asistencia.',
-        });
-      }
+      await this.databaseService.adm_proc_servidores(userCode);
 
       // Return success response
-      return this.response.success(user, token, 'Login Exitoso');
+      return {
+        success: true,
+        message: 'Login exitoso.',
+        data: user,
+        token: token,
+      };
     } catch (error) {
-      this.logger.error(`Error en el login: ${error.message}`);
-
       if (error instanceof RpcException) {
-        throw error; // Re-throw known exceptions
+        throw error; // Re-throw known RpcException
       }
-
       throw new RpcException({
         status: 500,
         message: `Error inesperado durante el proceso de login: ${error.message || error}`,
@@ -166,14 +153,14 @@ export class AppService {
         });
       }
 
-      return this.response.success('', '', 'Logout Exitoso');
+      return {
+        success: true,
+        message: 'Logout Exitoso',
+      };
     } catch (error) {
-      this.logger.error(`Error durante el logout: ${error.message}`);
-
       if (error instanceof RpcException) {
         throw error; // Re-throw known RpcException
       }
-
       throw new RpcException({
         status: 500,
         message: `Error inesperado durante el proceso de logout: ${error.message || error}`,
@@ -230,10 +217,6 @@ export class AppService {
 
       return this.response.success(menu, '', 'Menú generado exitosamente.');
     } catch (error) {
-      this.logger.error(
-        `Error al generar el menú de usuario: ${error.message}`,
-      );
-
       if (error instanceof RpcException) {
         throw error; // Re-throw known RpcException
       }
