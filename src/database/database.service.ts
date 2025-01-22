@@ -60,7 +60,7 @@ export class DatabaseService {
     }
   }
 
-  async getUserStatus(username: string) {
+  async getUserStatus(username: string): Promise<number> {
     try {
       const result = await this.connection.execute(
         `SELECT COUNT(*) AS NUM 
@@ -71,27 +71,23 @@ export class DatabaseService {
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
 
-      if (result.rows.length === 0) {
-        throw new RpcException({
-          status: 404,
-          message: 'Usuario no encontrado o está bloqueado.',
-        });
-      }
-
-      return result.rows[0].NUM || 0;
+      // Ensure NUM is safely extracted
+      const userStatus = result.rows[0]?.NUM || 0;
+      return userStatus;
     } catch (error) {
-      if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
-      }
+      this.logger.error(
+        `Error in getUserStatus for username: ${username}, Error: ${error.message}`,
+      );
 
+      // Directly throw an RpcException for unexpected errors
       throw new RpcException({
         status: 500,
-        message: `Error inesperado al ejecutar la consulta: ${error.message || error}`,
+        message: `Error inesperado al ejecutar la consulta.`,
       });
     }
   }
 
-  async getPassword(username: string, password: string) {
+  async getPassword(username: string, password: string): Promise<boolean> {
     try {
       const connection = await oracledb.getConnection({
         user: username,
@@ -100,10 +96,8 @@ export class DatabaseService {
       });
 
       await connection.close();
-      return true;
+      return true; // Password is valid
     } catch (error) {
-      this.logger.error(`Error al ejecutar la consulta: ${error.message}`);
-
       if (error.errorNum === 1017) {
         // Invalid username/password error
         throw new RpcException({
@@ -112,9 +106,10 @@ export class DatabaseService {
         });
       }
 
+      // Handle all other errors
       throw new RpcException({
         status: 500,
-        message: `Error inesperado: ${error.message || error}`,
+        message: 'Error inesperado al validar las credenciales.',
       });
     }
   }

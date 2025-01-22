@@ -83,12 +83,12 @@ export class AppService {
       const userCode = user.CODIGO;
 
       // Handle active token
-      const activeToken = await this.databaseService.retriveActiveToken(userId);
-      if (activeToken) {
+      const activeSesion =
+        await this.databaseService.retriveActiveToken(userId);
+      if (activeSesion) {
+        const activeToken = activeSesion.TOKEN;
         const decodedToken = this.jwtService.decode(activeToken);
-        console.log('decodedToken',decodedToken)
         const { websocketClient } = decodedToken;
-        console.log('websocketClient',websocketClient)
         await this.databaseService.updateStatus(userId, activeToken);
         this.websocket.logout(websocketClient);
       }
