@@ -48,7 +48,6 @@ export class AppService {
     const { username, password, websocketClient, ip } = authLoginDto;
 
     try {
-      // Check if user is locked
       const isLocked = await this.databaseService.getUserStatus(username);
       if (isLocked !== 0) {
         throw new RpcException({
@@ -57,21 +56,16 @@ export class AppService {
             'El usuario se encuentra bloqueado. Por favor, ingrese en la opción Desbloquear Usuario o comuníquese con el departamento de soporte técnico para obtener asistencia.',
         });
       }
-
-      // Validate password
       await this.databaseService.getPassword(username, password);
 
-      // Retrieve user information
       const user = await this.databaseService.getUsers(username);
       const userId = user.USER_ID;
       const userCode = user.CODIGO;
 
-      // Handle active token
       const activeSesion =
         await this.databaseService.retriveActiveToken(userId);
       if (activeSesion) {
         const activeToken = activeSesion.TOKEN;
-
         try {
           const decodedToken = this.jwtService.decode(activeToken);
           if (!decodedToken || typeof decodedToken !== 'object') {
@@ -82,11 +76,7 @@ export class AppService {
           }
 
           const { websocketClient } = decodedToken;
-
-          // Update session status
           await this.databaseService.updateStatus(userId, activeToken);
-
-          // Logout websocket client
           this.websocket.logout(websocketClient);
         } catch (error) {
           throw new RpcException({
@@ -95,26 +85,17 @@ export class AppService {
           });
         }
       }
-
-      // Generate new token
       const token = this.jwtService.sign({
         user_id: userId,
         username,
         ip,
         websocketClient,
       });
-
-      // Insert new token
       await this.databaseService.insertToken(Number(userId), token);
-
-      // Register user in the system
       await this.databaseService.adm_proc_servidores(userCode);
-
-      // Return success response
       return {
         success: true,
         message: 'Login exitoso.',
-        data: user,
         token: token,
       };
     } catch (error) {
