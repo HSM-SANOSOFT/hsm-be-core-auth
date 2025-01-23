@@ -4,7 +4,6 @@ import type { MicroserviceOptions } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 
 import { envs } from '../config';
-
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -29,5 +28,8 @@ async function bootstrap() {
   );
   await app.listen();
   logger.log(`Microservice is active on port ${envs.AUTH_MICROSERVICE_PORT}`);
+  logger.log(
+    `Websocket server is running on port ${envs.AUTH_WEBSOCKET_MICROSERVICE_PORT}`,
+  );
 }
 bootstrap();

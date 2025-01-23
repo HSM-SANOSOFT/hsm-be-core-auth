@@ -8,9 +8,10 @@ import {
 import { envs } from 'config';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway(envs.AUTH_WEBSOCKET_MICROSERVICE_PORT)
 export class Websocket implements OnGatewayConnection, OnGatewayDisconnect {
   logger = new Logger('AUTH WEBSOCKET');
+
   @WebSocketServer()
   server: Server;
 

@@ -12,8 +12,10 @@ dotenv.config({
 });
 
 interface EnvVars {
+  AUTH_MICROSERVICE_NAME: string;
   AUTH_MICROSERVICE_HOST: string;
   AUTH_MICROSERVICE_PORT: number;
+  AUTH_WEBSOCKET_MICROSERVICE_PORT: number;
 
   DB_USER: string;
   DB_PASSWORD: string;
@@ -29,8 +31,10 @@ interface EnvVars {
 
 const envsSchema = joi
   .object({
+    AUTH_MICROSERVICE_NAME: joi.string().required(),
     AUTH_MICROSERVICE_HOST: joi.string().default('localhost'),
     AUTH_MICROSERVICE_PORT: joi.number().required(),
+    AUTH_WEBSOCKET_MICROSERVICE_PORT: joi.number().required(),
 
     DB_USER: joi.string().required(),
     DB_PASSWORD: joi.string().required(),
@@ -55,8 +59,10 @@ if (error) {
 const envVars: EnvVars = value;
 
 export const envs = {
+  AUTH_MICROSERVICE_NAME: envVars.AUTH_MICROSERVICE_NAME,
   AUTH_MICROSERVICE_HOST: envVars.AUTH_MICROSERVICE_HOST,
   AUTH_MICROSERVICE_PORT: envVars.AUTH_MICROSERVICE_PORT,
+  AUTH_WEBSOCKET_MICROSERVICE_PORT: envVars.AUTH_WEBSOCKET_MICROSERVICE_PORT,
 
   DB_USER: envVars.DB_USER,
   DB_PASSWORD: envVars.DB_PASSWORD,
