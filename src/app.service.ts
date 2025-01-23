@@ -128,30 +128,23 @@ export class AppService {
     }
   }
 
-  async logout(authHeader: any) {
+  async logout(authHeader: string) {
     try {
-      // Extract and decode the token
-      const token = authHeader.split(' ')[1];
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.slice(7)
+        : null;
+
       const decoded = this.jwtService.decode(token) as any;
 
       if (!decoded || !decoded.user_id) {
         throw new RpcException({
-          status: 400,
+          status: HttpStatus.BAD_REQUEST,
           message: 'Token inválido o no contiene información de usuario.',
         });
       }
 
       const { user_id } = decoded;
-
-      // Update the token status in the database
-      const result = await this.databaseService.updateStatus(user_id, token);
-      if (!result) {
-        throw new RpcException({
-          status: 400,
-          message:
-            'No se pudo cerrar la sesión. El token no está activo o ya fue deshabilitado.',
-        });
-      }
+      await this.databaseService.updateStatus(user_id, token);
 
       return {
         success: true,
@@ -159,11 +152,12 @@ export class AppService {
       };
     } catch (error) {
       if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        throw error;
       }
+
       throw new RpcException({
-        status: 500,
-        message: `Error inesperado durante el proceso de logout: ${error.message || error}`,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Error inesperado durante el proceso de logout: ${error.message || 'Sin detalles adicionales'}`,
       });
     }
   }
@@ -218,9 +212,8 @@ export class AppService {
       return this.response.success(menu, '', 'Menú generado exitosamente.');
     } catch (error) {
       if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        throw error;
       }
-
       throw new RpcException({
         status: 500,
         message: `Error inesperado al generar el menú de usuario: ${error.message || error}`,
@@ -232,47 +225,21 @@ export class AppService {
     const { user_cod, tipo, ip } = generatecodeDto;
 
     try {
-      // Generate a 6-digit random code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // Update the existing code status
-      const updateResult = await this.databaseService.updateCode(
-        user_cod,
-        tipo,
-      );
-      if (!updateResult) {
-        throw new RpcException({
-          status: 400,
-          message: 'No se pudo actualizar el código anterior.',
-        });
-      }
-
-      // Insert the new verification code
-      const insertResult = await this.databaseService.insertCode(
-        user_cod,
-        ip,
-        Number(code),
-        tipo,
-      );
-      if (!insertResult) {
-        throw new RpcException({
-          status: 500,
-          message: 'No se pudo insertar el nuevo código de verificación.',
-        });
-      }
-
-      // Return the generated code if everything is successful
+      await this.databaseService.updateCode(user_cod, tipo);
+      await this.databaseService.insertCode(user_cod, ip, Number(code), tipo);
       this.logger.log(
-        `Código generado exitosamente para el usuario ${user_cod}.`,
+        `Código ${code} generado exitosamente para el usuario ${user_cod}.`,
       );
-      return code;
+      return {
+        success: true,
+        message: 'Código generado con éxito.',
+        data: code,
+      };
     } catch (error) {
-      this.logger.error(`Error al generar el código: ${error.message}`);
-
       if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        throw error;
       }
-
       throw new RpcException({
         status: 500,
         message: `Error inesperado al generar el código: ${error.message || error}`,
@@ -282,25 +249,15 @@ export class AppService {
 
   async validateCode(validateCodeDto: ValidateCodeDto) {
     try {
-      const isValid = await this.databaseService.validateCode(validateCodeDto);
-
-      if (!isValid) {
-        throw new RpcException({
-          status: 400,
-          message: 'Código incorrecto o no válido.',
-        });
-      }
-
-      return this.response.success('', '', 'Código validado con éxito.');
+      await this.databaseService.validateCode(validateCodeDto);
+      return {
+        success: true,
+        message: 'Código validado con éxito.',
+      };
     } catch (error) {
-      this.logger.error(
-        `Error durante la validación del código: ${error.message}`,
-      );
-
       if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        throw error;
       }
-
       throw new RpcException({
         status: 500,
         message: `Error inesperado durante la validación del código: ${error.message || error}`,

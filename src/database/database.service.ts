@@ -227,29 +227,23 @@ export class DatabaseService {
     }
   }
 
-  async validateCode(validateCodeDto: ValidateCodeDto) {
+  async validateCode(validateCodeDto: ValidateCodeDto): Promise<boolean> {
     const { user_cod, code, tipo } = validateCodeDto;
 
     try {
-      // Check if the code exists and is valid
       const result = await this.connection.execute(
         `SELECT INTENTO FROM PDP_LOG_COD_VERIFICACION 
        WHERE USER_COD = :user_cod AND ESTADO = '1' AND TIPO = :tipo AND CODIGO = :code`,
         { user_cod, tipo, code },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
-
       if (result.rows.length === 0) {
         throw new RpcException({
           status: HttpStatus.BAD_REQUEST,
           message: 'Código incorrecto.',
         });
       }
-
-      // Increment the attempt count
       const currentIntento = result.rows[0].INTENTO + 1;
-
-      // Check if the maximum number of attempts has been reached
       if (currentIntento >= 5) {
         await this.connection.execute(
           `UPDATE PDP_LOG_COD_VERIFICACION 
@@ -263,8 +257,6 @@ export class DatabaseService {
           message: 'Código bloqueado por intentos fallidos.',
         });
       }
-
-      // Update the attempt count in the database
       await this.connection.execute(
         `UPDATE PDP_LOG_COD_VERIFICACION 
        SET INTENTO = :currentIntento 
@@ -273,20 +265,11 @@ export class DatabaseService {
         { autoCommit: true },
       );
 
-      return {
-        success: true,
-        message: 'Código correcto.',
-      };
+      return true;
     } catch (error) {
-      if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
-      }
-
-      this.logger.error(`Unexpected server error: ${error.message}`);
-
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Unexpected server error.',
+        message: `Error inesperado en la base de datos: ${error.message || 'Sin detalles adicionales'}`,
       });
     }
   }
@@ -307,25 +290,17 @@ export class DatabaseService {
       );
 
       if (result.rowsAffected && result.rowsAffected > 0) {
-        this.logger.log('Registro insertado con éxito.');
-        return true;
-      } else {
-        this.logger.warn('No se insertó ningún registro.');
-        throw new RpcException({
-          status: HttpStatus.CONFLICT,
-          message: 'No se pudo insertar el registro.',
-        });
-      }
-    } catch (error) {
-      this.logger.error(`Error en la base de datos: ${error.message}`);
-
-      if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        return true; // Insert successful
       }
 
       throw new RpcException({
+        status: HttpStatus.CONFLICT,
+        message: 'No se pudo insertar el registro.',
+      });
+    } catch (error) {
+      throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Error inesperado en la base de datos: ${error.message || error}`,
+        message: `Error inesperado en la base de datos: ${error.message || 'Sin detalles adicionales'}`,
       });
     }
   }
@@ -341,25 +316,17 @@ export class DatabaseService {
       );
 
       if (result.rowsAffected && result.rowsAffected > 0) {
-        this.logger.log('Registro actualizado con éxito.');
-        return true;
-      } else {
-        this.logger.warn('No se actualizó ningún registro.');
-        throw new RpcException({
-          status: HttpStatus.NOT_FOUND,
-          message: 'No se encontró ningún registro para actualizar.',
-        });
-      }
-    } catch (error) {
-      this.logger.error(`Error en la base de datos: ${error.message}`);
-
-      if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        return true; // Update successful
       }
 
       throw new RpcException({
+        status: HttpStatus.NOT_FOUND,
+        message: 'No se encontró ningún registro para actualizar.',
+      });
+    } catch (error) {
+      throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Error inesperado en la base de datos: ${error.message || error}`,
+        message: `Error inesperado en la base de datos: ${error.message || 'Sin detalles adicionales'}`,
       });
     }
   }
