@@ -105,7 +105,7 @@ export class AppService {
       };
     } catch (error) {
       if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
+        throw error;
       }
       throw new RpcException({
         status: 500,
