@@ -5,7 +5,6 @@ import { Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
 import { AuthLoginDto } from './dto/authLogin.dto';
 import { GenerateCodeDto } from './dto/generateCode.dto';
-import { UserMenuDto } from './dto/usermenu.dto';
 import { ValidateCodeDto } from './dto/validateCode.dto';
 
 @Controller()
@@ -30,11 +29,6 @@ export class AppController {
   @MessagePattern('logout')
   logout(@Payload() authHeader: string) {
     return this.appService.logout(authHeader);
-  }
-
-  @MessagePattern('usermenu')
-  usermenu(@Payload() usermenuDto: UserMenuDto) {
-    return this.appService.usermenu(usermenuDto);
   }
 
   @MessagePattern('generateCode')

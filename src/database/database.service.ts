@@ -153,6 +153,7 @@ export class DatabaseService {
       );
 
       if (result.rowsAffected && result.rowsAffected > 0) {
+        this.logger.log('Token status changed');
         return true; // Update successful
       }
 
@@ -184,44 +185,6 @@ export class DatabaseService {
       if (error instanceof RpcException) {
         throw error;
       }
-      throw new RpcException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Error inesperado al ejecutar la consulta: ${error.message || error}`,
-      });
-    }
-  }
-
-  async menuUsuario(usercode: string) {
-    try {
-      const result = await this.connection.execute(
-        `SELECT SGM.ID_GRUPO_MENU, SGM.DESCRIPCION AS MENU, MDG.POSICION, MDG.ID_SUBGRUPO, 
-              MDG.NOM_COR AS SUB_MENU, MDG.DESCRIPCION AS DES_SUBMENU, CM.ID_CONTENIDO, 
-              CM.DIRECTORIO, CM.DESCRIPCION AS NOMBRE, CM.PARAMETROS, CM.NOMBRE_ARCHIVO, CM.ORDEN
-       FROM SN_PRIVILEGIOS_USUARIO_MODULOS PUM
-       INNER JOIN SN_GRUPO_MENU SGM ON SGM.ID_GRUPO_MENU = PUM.ID_GRUPO
-       INNER JOIN SN_SUBGRUPO_MENU MDG ON PUM.ID_GRUPO = MDG.ID_GRUPO AND PUM.ID_MENU = MDG.ID_SUBGRUPO
-       INNER JOIN SN_CONTENIDO_MENU_N CM ON CM.ID_CONTENIDO = PUM.ID_CONTENIDO
-       WHERE PUM.CODIGO_USUARIO = :usercode AND MDG.ESTATUS = 'A' AND PUM.ESTATUS = 'A' AND CM.ESTATUS = 'A'
-       ORDER BY SGM.ID_GRUPO_MENU, MDG.POSICION, CM.ORDEN ASC`,
-        [usercode],
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
-      );
-
-      if (result.rows.length === 0) {
-        throw new RpcException({
-          status: HttpStatus.NOT_FOUND,
-          message: 'No se encontraron menús disponibles para este usuario.',
-        });
-      }
-
-      return result.rows;
-    } catch (error) {
-      this.logger.error(`Error al ejecutar la consulta: ${error.message}`);
-
-      if (error instanceof RpcException) {
-        throw error; // Re-throw known RpcException
-      }
-
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado al ejecutar la consulta: ${error.message || error}`,

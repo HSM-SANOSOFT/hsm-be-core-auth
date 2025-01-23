@@ -5,7 +5,6 @@ import { RpcException } from '@nestjs/microservices';
 import { DatabaseService } from './database/database.service';
 import { AuthLoginDto } from './dto/authLogin.dto';
 import { GenerateCodeDto } from './dto/generateCode.dto';
-import { UserMenuDto } from './dto/usermenu.dto';
 import { ValidateCodeDto } from './dto/validateCode.dto';
 import { Websocket } from './websocket/websocket';
 
@@ -18,27 +17,6 @@ export class AppService {
   ) {}
 
   private readonly logger = new Logger('AUTH');
-
-  private response = {
-    success: (data: any, token: string, message = 'Operation Successful') => ({
-      success: true,
-      message,
-      data: data || '',
-      token: token || '',
-    }),
-
-    error: (error: string, statusCode = 400) => {
-      throw new RpcException({
-        statusCode,
-        message: {
-          success: false,
-          error: error,
-          data: [],
-          token: '',
-        },
-      });
-    },
-  };
 
   InitMS() {
     return 'Microservice is up and running!';
@@ -75,8 +53,10 @@ export class AppService {
             });
           }
 
-          const { websocketClient } = decodedToken;
           await this.databaseService.updateStatus(userId, activeToken);
+
+          const { websocketClient } = decodedToken;
+          this.logger.log(`Websocket client: ${websocketClient}`);
           this.websocket.logout(websocketClient);
         } catch (error) {
           throw new RpcException({
@@ -143,65 +123,6 @@ export class AppService {
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado durante el proceso de logout: ${error.message || 'Sin detalles adicionales'}`,
-      });
-    }
-  }
-
-  async usermenu(usermenuDto: UserMenuDto) {
-    const { usercode } = usermenuDto;
-
-    try {
-      const datos = await this.databaseService.menuUsuario(usercode);
-
-      if (!datos || datos.length === 0) {
-        throw new RpcException({
-          status: 404,
-          message: 'No se encontraron menús disponibles para este usuario.',
-        });
-      }
-
-      const menu: any[] = [];
-
-      // Build the menu structure
-      datos.forEach(item => {
-        let group = menu.find(g => g.id === item.ID_GRUPO_MENU);
-
-        if (!group) {
-          group = {
-            id: item.ID_GRUPO_MENU,
-            Nombre: item.MENU,
-            icono: '',
-            submenu: [],
-          };
-          menu.push(group);
-        }
-
-        let submenu = group.submenu.find(s => s.id === item.ID_SUBGRUPO);
-        if (!submenu) {
-          submenu = {
-            id: item.ID_SUBGRUPO,
-            Nombre: item.SUB_MENU,
-            descripcion: item.DES_SUBMENU,
-            items: [],
-          };
-          group.submenu.push(submenu);
-        }
-
-        submenu.items.push({
-          id: item.ID_CONTENIDO,
-          Nombre: item.NOMBRE,
-          url: item.DIRECTORIO + item.NOMBRE_ARCHIVO + item.PARAMETROS,
-        });
-      });
-
-      return this.response.success(menu, '', 'Menú generado exitosamente.');
-    } catch (error) {
-      if (error instanceof RpcException) {
-        throw error;
-      }
-      throw new RpcException({
-        status: 500,
-        message: `Error inesperado al generar el menú de usuario: ${error.message || error}`,
       });
     }
   }

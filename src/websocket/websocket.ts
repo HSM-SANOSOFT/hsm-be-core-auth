@@ -25,6 +25,7 @@ export class Websocket implements OnGatewayConnection, OnGatewayDisconnect {
 
   logout(clientId: string) {
     const client = this.server.sockets.sockets.get(clientId);
+    this.logger.log(`Client is :${client}`);
     if (client) {
       client.emit('logout', { action: 'logout' });
       this.logger.log(`Logout event sent to client: ${clientId}`);

@@ -1,7 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { MicroserviceOptions } from '@nestjs/microservices';
-import { Transport } from '@nestjs/microservices';
 import { RpcException, Transport } from '@nestjs/microservices';
 
 import { envs } from '../config';
