@@ -96,6 +96,11 @@ export class AppService {
       return {
         success: true,
         message: 'Login exitoso.',
+        userData: {
+          username,
+          userCode,
+          userId,
+        },
         token: token,
       };
     } catch (error) {
