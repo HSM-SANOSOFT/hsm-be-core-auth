@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { MicroserviceOptions } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
+import { RpcException, Transport } from '@nestjs/microservices';
 
 import { envs } from '../config';
 import { AppModule } from './app.module';
@@ -24,6 +25,10 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      disableErrorMessages: true,
+      exceptionFactory: errors => {
+        return new RpcException(errors);
+      },
     }),
   );
   await app.listen();
