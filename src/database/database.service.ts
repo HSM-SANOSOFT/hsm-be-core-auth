@@ -14,19 +14,6 @@ export class DatabaseService {
 
   private readonly logger = new Logger('AUTH DATABASE');
 
-  private response = {
-    error: (error: string, status = HttpStatus.BAD_REQUEST) => {
-      //this.logger.log(`Error al ejecutar la consulta: ${error}`);
-      throw new RpcException({
-        status,
-        message: {
-          success: false,
-          error: error,
-        },
-      });
-    },
-  };
-
   async getUsers(username: string) {
     try {
       const result = await this.connection.execute(
@@ -49,6 +36,9 @@ export class DatabaseService {
 
       return result.rows[0];
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado al ejecutar la consulta: ${error.message || error}`,
@@ -71,6 +61,9 @@ export class DatabaseService {
       const userStatus = result.rows[0]?.NUM || 0;
       return userStatus;
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado al ejecutar la consulta: ${error.message || error}`,
@@ -125,6 +118,9 @@ export class DatabaseService {
         message: 'No se pudo insertar el token.',
       });
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado al insertar el token: ${error.message || 'Sin detalles adicionales'}`,
@@ -165,6 +161,9 @@ export class DatabaseService {
         message: 'No se encontró ninguna sesión activa para actualizar.',
       });
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado al actualizar el estado: ${error.message || 'Sin detalles adicionales'}`,
@@ -182,6 +181,9 @@ export class DatabaseService {
 
       return result.rows[0] || null;
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado al ejecutar la consulta: ${error.message || error}`,
@@ -267,6 +269,9 @@ export class DatabaseService {
 
       return true;
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado en la base de datos: ${error.message || 'Sin detalles adicionales'}`,
@@ -298,6 +303,9 @@ export class DatabaseService {
         message: 'No se pudo insertar el registro.',
       });
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado en la base de datos: ${error.message || 'Sin detalles adicionales'}`,
@@ -324,6 +332,9 @@ export class DatabaseService {
         message: 'No se encontró ningún registro para actualizar.',
       });
     } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado en la base de datos: ${error.message || 'Sin detalles adicionales'}`,

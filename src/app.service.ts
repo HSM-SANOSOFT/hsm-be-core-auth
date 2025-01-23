@@ -154,7 +154,6 @@ export class AppService {
       if (error instanceof RpcException) {
         throw error;
       }
-
       throw new RpcException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Error inesperado durante el proceso de logout: ${error.message || 'Sin detalles adicionales'}`,
