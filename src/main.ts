@@ -29,7 +29,7 @@ async function bootstrap() {
   await app.listen();
   logger.log(`Microservice is active on port ${envs.AUTH_MICROSERVICE_PORT}`);
   logger.log(
-    `Websocket server is running on port ${envs.AUTH_WEBSOCKET_MICROSERVICE_PORT}`,
+    `Websocket server is running on port ${envs.AUTH_WEBSOCKET_MICROSERVICE_PORT} `,
   );
 }
 bootstrap();
