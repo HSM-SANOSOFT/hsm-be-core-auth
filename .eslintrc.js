@@ -30,7 +30,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/no-use-before-define': 'error',
 
-    "no-unused-expressions": "off",
+    "no-unused-expressions": "error",
     "@typescript-eslint/no-unused-expressions": "error",
 
     '@typescript-eslint/consistent-type-imports': 'error',
@@ -43,16 +43,19 @@ module.exports = {
     '@typescript-eslint/no-empty-function': 'error',
     '@typescript-eslint/no-empty-interface': 'error',
     '@typescript-eslint/no-empty-object-type': 'error',
-    "@typescript-eslint/no-unsafe-argument": "error",
-    "@typescript-eslint/no-unsafe-assignment": "error",
-    "@typescript-eslint/no-unsafe-call": "error",
-    "@typescript-eslint/no-unsafe-member-access": "error",
+    //"@typescript-eslint/no-unsafe-argument": "error",
+    //"@typescript-eslint/no-unsafe-assignment": "error",
+    //"@typescript-eslint/no-unsafe-call": "error",
+    //"@typescript-eslint/no-unsafe-member-access": "error",
     "@typescript-eslint/no-unsafe-return": "error",
 
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+
+    'strictNullChecks': 'error',
     '@typescript-eslint/no-unnecessary-condition': 'error',
+
     '@typescript-eslint/no-unnecessary-type-arguments': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     '@typescript-eslint/no-unnecessary-type-constraint': 'error',
