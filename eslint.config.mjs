@@ -54,9 +54,6 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
 
-      'strictNullChecks': 'error',
-      '@typescript-eslint/no-unnecessary-condition': 'error',
-
       '@typescript-eslint/no-unnecessary-type-arguments': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/no-unnecessary-type-constraint': 'error',
