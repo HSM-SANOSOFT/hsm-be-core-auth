@@ -12,10 +12,10 @@ dotenv.config({
 });
 
 interface EnvVars {
-  AUTH_MICROSERVICE_NAME: string;
-  AUTH_MICROSERVICE_HOST: string;
-  AUTH_MICROSERVICE_PORT: number;
-  AUTH_WEBSOCKET_MICROSERVICE_PORT: number;
+  HSM_CORE_AUTH_NAME: string;
+  HSM_CORE_AUTH_HOST: string;
+  HSM_CORE_AUTH_PORT: number;
+  HSM_CORE_AUTH_WS_PORT: number;
 
   DB_USER: string;
   DB_PASSWORD: string;
@@ -24,17 +24,17 @@ interface EnvVars {
 
   JWT_SECRET: string;
 
-  COMS_MICROSERVICE_NAME: string;
-  COMS_MICROSERVICE_HOST: string;
-  COMS_MICROSERVICE_PORT: number;
+  HSM_CORE_COMS_NAME: string;
+  HSM_CORE_COMS_HOST: string;
+  HSM_CORE_COMS_PORT: number;
 }
 
 const envsSchema = joi
   .object({
-    AUTH_MICROSERVICE_NAME: joi.string().required(),
-    AUTH_MICROSERVICE_HOST: joi.string().default('localhost'),
-    AUTH_MICROSERVICE_PORT: joi.number().required(),
-    AUTH_WEBSOCKET_MICROSERVICE_PORT: joi.number().required(),
+    HSM_CORE_AUTH_NAME: joi.string().required(),
+    HSM_CORE_AUTH_HOST: joi.string().default('localhost'),
+    HSM_CORE_AUTH_PORT: joi.number().required(),
+    HSM_CORE_AUTH_WS_PORT: joi.number().required(),
 
     DB_USER: joi.string().required(),
     DB_PASSWORD: joi.string().required(),
@@ -43,9 +43,9 @@ const envsSchema = joi
 
     JWT_SECRET: joi.string().default('sanosoft'),
 
-    COMS_MICROSERVICE_NAME: joi.string().required(),
-    COMS_MICROSERVICE_HOST: joi.string().default('localhost'),
-    COMS_MICROSERVICE_PORT: joi.number().required(),
+    HSM_CORE_COMS_NAME: joi.string().required(),
+    HSM_CORE_COMS_HOST: joi.string().default('localhost'),
+    HSM_CORE_COMS_PORT: joi.number().required(),
   })
   .unknown()
   .required();
@@ -59,10 +59,10 @@ if (error) {
 const envVars: EnvVars = value;
 
 export const envs = {
-  AUTH_MICROSERVICE_NAME: envVars.AUTH_MICROSERVICE_NAME,
-  AUTH_MICROSERVICE_HOST: envVars.AUTH_MICROSERVICE_HOST,
-  AUTH_MICROSERVICE_PORT: envVars.AUTH_MICROSERVICE_PORT,
-  AUTH_WEBSOCKET_MICROSERVICE_PORT: envVars.AUTH_WEBSOCKET_MICROSERVICE_PORT,
+  HSM_CORE_AUTH_NAME: envVars.HSM_CORE_AUTH_NAME,
+  HSM_CORE_AUTH_HOST: envVars.HSM_CORE_AUTH_HOST,
+  HSM_CORE_AUTH_PORT: envVars.HSM_CORE_AUTH_PORT,
+  HSM_CORE_AUTH_WS_PORT: envVars.HSM_CORE_AUTH_WS_PORT,
 
   DB_USER: envVars.DB_USER,
   DB_PASSWORD: envVars.DB_PASSWORD,
@@ -71,7 +71,7 @@ export const envs = {
 
   JWT_SECRET: envVars.JWT_SECRET,
 
-  COMS_MICROSERVICE_NAME: envVars.COMS_MICROSERVICE_NAME,
-  COMS_MICROSERVICE_HOST: envVars.COMS_MICROSERVICE_HOST,
-  COMS_MICROSERVICE_PORT: envVars.COMS_MICROSERVICE_PORT,
+  HSM_CORE_COMS_NAME: envVars.HSM_CORE_COMS_NAME,
+  HSM_CORE_COMS_HOST: envVars.HSM_CORE_COMS_HOST,
+  HSM_CORE_COMS_PORT: envVars.HSM_CORE_COMS_PORT,
 };
