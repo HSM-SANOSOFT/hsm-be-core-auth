@@ -1,6 +1,7 @@
 // @ts-check
 import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -12,28 +13,28 @@ export default tseslint.config(
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
   {
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+    },
     languageOptions: {
       globals: {
         ...globals.node,
         ...globals.jest,
       },
-      ecmaVersion: 5,
+      ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+        tsconfigRootDir: import.meta.url,
       },
     },
   },
   {
     rules: {
       // TypeScript Rules
-      "no-unused-vars": "off",
-      '@typescript-eslint/no-unused-vars': 'error',
+      'no-unused-vars': 'off', // Disable base rule
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-use-before-define': 'error',
-
-      "no-unused-expressions": "error",
-      "@typescript-eslint/no-unused-expressions": "error",
 
       '@typescript-eslint/consistent-type-imports': 'error',
       "@typescript-eslint/triple-slash-reference": "error",
