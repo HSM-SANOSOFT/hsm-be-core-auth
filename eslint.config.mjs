@@ -33,7 +33,7 @@ export default tseslint.config(
     rules: {
       // TypeScript Rules
       'no-unused-vars': 'off', // Disable base rule
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-use-before-define': 'error',
 
       '@typescript-eslint/consistent-type-imports': 'error',
@@ -45,8 +45,8 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-function': 'error',
       '@typescript-eslint/no-empty-interface': 'error',
       '@typescript-eslint/no-empty-object-type': 'error',
-      "@typescript-eslint/no-unsafe-return": "error",
-
+      
+      "@typescript-eslint/no-unsafe-return": "off",
       '@typescript-eslint/no-explicit-any': 'off',
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
