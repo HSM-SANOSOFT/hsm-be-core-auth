@@ -10,7 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10        
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
         
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -48,10 +59,10 @@ jobs:
         run: |
           echo "Navigating to directory: ${{secrets.PATH_DOCKER_COMPOSE}}"
           cd ${{secrets.PATH_DOCKER_COMPOSE}}
-
+          
           echo "Pulling the latest image for ${{vars.MICROSERVICE_NAME}}..."
           echo "docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest"
           docker pull ghcr.io/hsm-sanosoft/${{vars.MICROSERVICE_NAME}}:latest
 
           echo "Restarting ${{steps.string.outputs.uppercase}} container..."
-          docker-compose -f docker-compose.prod.yml --env-file ./envs/global.env up -d --no-deps ${{steps.string.outputs.uppercase}}
+          docker-compose -f docker-compose.prod.yml up -d --no-deps ${{steps.string.outputs.uppercase}}
