@@ -123,6 +123,9 @@ importers:
       '@types/node':
         specifier: ^22.13.10
         version: 22.13.10
+      '@types/oracledb':
+        specifier: ^6.5.3
+        version: 6.5.3
       '@types/supertest':
         specifier: ^6.0.2
         version: 6.0.2
@@ -992,6 +995,9 @@ packages:
 
   '@types/node@22.13.10':
     resolution: {integrity: sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==}
+
+  '@types/oracledb@6.5.3':
+    resolution: {integrity: sha512-qrcKBezSXi8MltjKtYOQTN+tk7YjeiLjLO4SgXuzGvUGmLMkDLWTRJ4OtM3YoW9dzi/tQeUdgatTmOOE3nSAVg==}
 
   '@types/qs@6.9.18':
     resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
@@ -4483,6 +4489,10 @@ snapshots:
   '@types/node@22.13.10':
     dependencies:
       undici-types: 6.20.0
+
+  '@types/oracledb@6.5.3':
+    dependencies:
+      '@types/node': 22.13.10
 
   '@types/qs@6.9.18': {}
 

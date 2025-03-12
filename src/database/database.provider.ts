@@ -6,29 +6,27 @@ export const databaseProviders = [
   {
     provide: 'DATABASE_CONNECTION',
     useFactory: async () => {
-      const logger = new Logger('DatabaseProvider'); // Initialize NestJS Logger
-
+      const logger = new Logger('DatabaseProvider');
       try {
-        oracledb.initOracleClient({ libDir: envs.LD_LIBRARY_PATH });
-        logger.log('Oracle client initialized.');
-
+        oracledb.initOracleClient({
+          libDir: envs.LD_LIBRARY_PATH,
+        });
+        (oracledb.fetchAsString as unknown) = [oracledb.CLOB];
+        (oracledb.fetchAsBuffer as unknown) = [oracledb.BLOB];
         const pool = await oracledb.createPool({
           user: envs.DB_USER,
           password: envs.DB_PASSWORD,
           connectString: envs.DB_CONNECTION_STRING,
+          poolTimeout: 60,
+          poolMin: 1,
+          poolMax: 10,
+          poolIncrement: 1,
         });
-        logger.log('Connection pool created successfully.');
+        logger.log('Oracle connection pool established successfully.');
 
-        const connection = await pool.getConnection();
-        logger.log('Database connection established successfully.');
-
-        return connection;
+        return pool;
       } catch (error) {
-        logger.error(
-          'Error during database initialization:',
-          error.message || error,
-        );
-        throw error; // Re-throw the error to propagate it up the chain
+        logger.error(`Error during database initialization: ${error}`);
       }
     },
   },

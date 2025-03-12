@@ -7,15 +7,15 @@ import { envs } from '../config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const logger = new Logger(envs.AUTH_MICROSERVICE_NAME);
+  const logger = new Logger(envs.HSM_BE_CORE_AUTH_NAME);
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
       transport: Transport.TCP,
       options: {
-        host: envs.AUTH_MICROSERVICE_HOST,
-        port: envs.AUTH_MICROSERVICE_PORT,
+        host: envs.HSM_BE_CORE_AUTH_HOST,
+        port: envs.HSM_BE_CORE_AUTH_PORT,
       },
     },
   );
@@ -31,9 +31,9 @@ async function bootstrap() {
     }),
   );
   await app.listen();
-  logger.log(`Microservice is active on port ${envs.AUTH_MICROSERVICE_PORT}`);
+  logger.log(`Microservice is active on port ${envs.HSM_BE_CORE_AUTH_PORT}`);
   logger.log(
-    `Websocket server is running on port ${envs.AUTH_WEBSOCKET_MICROSERVICE_PORT} `,
+    `Websocket server is running on port ${envs.HSM_BE_CORE_AUTH_WS_PORT} `,
   );
 }
-bootstrap();
+void bootstrap();
