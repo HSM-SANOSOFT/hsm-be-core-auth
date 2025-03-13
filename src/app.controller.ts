@@ -17,7 +17,9 @@ export class AppController {
       ip: string;
     },
   ) {
-    return await this.appService.pinGeneration(data);
+    const response = await this.appService.pinGeneration(data);
+    this.logger.log(response);
+    return response;
   }
 
   @MessagePattern('pinValidation')
@@ -30,6 +32,8 @@ export class AppController {
       ip: string;
     },
   ) {
-    return data;
+    const response = data;
+    this.logger.log(response);
+    return response;
   }
 }
