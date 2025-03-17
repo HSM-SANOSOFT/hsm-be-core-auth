@@ -23,16 +23,16 @@ export class AppController {
   }
 
   @MessagePattern('pinValidation')
-  pinValidation(
+  async pinValidation(
     @Payload()
     data: {
       idDocs: string;
       TIPO: string;
-      NUMERO_ENVIADO: number;
+      NUMERO_RECIBIDO: number;
       ip: string;
     },
   ) {
-    const response = data;
+    const response = await this.appService.pinValidation(data);
     this.logger.log(response);
     return response;
   }
