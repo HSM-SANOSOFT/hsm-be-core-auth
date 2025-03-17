@@ -90,4 +90,89 @@ export class DatabaseService {
       }
     }
   }
+
+  async pinValidation(data: {
+    idDocs: string;
+    TIPO: string;
+    NUMERO_RECIBIDO: number;
+    ip: string;
+  }) {
+    let connection: oracledb.Connection | null = null;
+    try {
+      connection = await this.dbPool.getConnection();
+      const resultPin = await connection.execute(
+        'SELECT NUMERO_ENVIADO, ACCESO_INCORRECTOS FROM PDP_LOG_SEGUNDA_VERIFICACION WHERE CEDULA = :CEDULA AND TIPO = :TIPO AND ESTADO = :ESTADO',
+        [data.idDocs, data.TIPO, 'D'],
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+
+      if (!resultPin.rows?.length) {
+        throw new RpcException({
+          status: HttpStatus.NOT_FOUND,
+          message: `No se Encontro Pin Disponible para ID: ${data.idDocs}`,
+        });
+      }
+
+      const pinInfo = resultPin.rows?.[0] as {
+        NUMERO_ENVIADO: number;
+        ACCESO_INCORRECTOS: number;
+      };
+
+      const NUMERO_ENVIADO = pinInfo.NUMERO_ENVIADO;
+
+      const pinValidation = data.NUMERO_RECIBIDO === NUMERO_ENVIADO;
+
+      if (!pinValidation) {
+        const intentoActual = pinInfo.ACCESO_INCORRECTOS;
+
+        if (intentoActual >= 4) {
+          await connection.execute(
+            `UPDATE PDP_LOG_SEGUNDA_VERIFICACION SET ESTADO = 'N' WHERE CEDULA = :CEDULA AND TIPO = :TIPO AND ESTADO = :ESTADO AND NUMERO_ENVIADO = :NUMERO_ENVIADO`,
+            [data.idDocs, data.TIPO, 'D', NUMERO_ENVIADO],
+            { autoCommit: true },
+          );
+          throw new RpcException({
+            status: HttpStatus.FORBIDDEN,
+            message: `Excedio el numero de intentos permitidos para ID: ${data.idDocs}`,
+          });
+        }
+
+        await connection.execute(
+          'UPDATE PDP_LOG_SEGUNDA_VERIFICACION SET ACCESO_INCORRECTOS = :ACCESO_INCORRECTOS WHERE CEDULA = :CEDULA AND TIPO = :TIPO AND ESTADO = :ESTADO AND NUMERO_ENVIADO = :NUMERO_ENVIADO',
+          [intentoActual + 1, data.idDocs, data.TIPO, 'D', NUMERO_ENVIADO],
+          { autoCommit: true },
+        );
+        throw new RpcException({
+          status: HttpStatus.BAD_REQUEST,
+          message: `PIN validation failed for ID: ${data.idDocs}, intento actual: ${intentoActual + 1}`,
+        });
+      }
+      await connection.execute(
+        `UPDATE PDP_LOG_SEGUNDA_VERIFICACION SET ESTADO = 'U' WHERE CEDULA = :CEDULA AND TIPO = :TIPO AND ESTADO = :ESTADO AND NUMERO_ENVIADO = :NUMERO_ENVIADO`,
+        [data.idDocs, data.TIPO, 'D', NUMERO_ENVIADO],
+        { autoCommit: true },
+      );
+
+      return {
+        message: `PIN validation successful for ID: ${data.idDocs}`,
+      };
+    } catch (error) {
+      if (error instanceof RpcException) {
+        throw error;
+      }
+      this.logger.error(`Error fetching data: ${error}`);
+      throw new RpcException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Error fetching data: ${error}`,
+      });
+    } finally {
+      if (connection) {
+        try {
+          await connection.close();
+        } catch (error) {
+          this.logger.error(error);
+        }
+      }
+    }
+  }
 }

@@ -16,4 +16,13 @@ export class AppService {
     const pin = Math.floor(pinMin + Math.random() * pinMax);
     return await this.databaseService.pinGeneration({ ...data, fecha, pin });
   }
+
+  async pinValidation(data: {
+    idDocs: string;
+    TIPO: string;
+    NUMERO_RECIBIDO: number;
+    ip: string;
+  }) {
+    return await this.databaseService.pinValidation(data);
+  }
 }
