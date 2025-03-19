@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { envs } from 'config';
+import { envs } from 'src/config';
 import * as oracledb from 'oracledb';
 
 export const databaseProviders = [
