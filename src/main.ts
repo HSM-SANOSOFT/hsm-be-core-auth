@@ -1,9 +1,9 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { MicroserviceOptions } from '@nestjs/microservices';
-import { RpcException, Transport } from '@nestjs/microservices';
+import { Transport } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './filters/all-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -15,17 +15,7 @@ async function bootstrap() {
       },
     },
   );
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      disableErrorMessages: true,
-      exceptionFactory: errors => {
-        return new RpcException(errors);
-      },
-    }),
-  );
+  app.useGlobalFilters(new AllExceptionsFilter());
   await app.listen();
 }
 void bootstrap();
