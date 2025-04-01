@@ -21,7 +21,7 @@ RUN cd /tmp/oracle-client && \
     alien -i oracle-instantclient12.1-sqlplus-12.1.0.2.0-1.x86_64.rpm && \
     rm -rf /tmp/oracle-client
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@latest
 WORKDIR /app
 COPY package*.json .
 RUN pnpm install
