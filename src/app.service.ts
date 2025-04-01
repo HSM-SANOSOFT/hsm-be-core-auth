@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { DatabaseService } from './database/database.service';
+import { DatabaseRepository } from './database/database.repository';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseRepository: DatabaseRepository) {}
 
   async pinGeneration(data: { idDocs: string; TIPO: string; ip: string }) {
     const fecha = new Date();
@@ -14,7 +14,9 @@ export class AppService {
     const pinMin = 10 ** (pinLength - 1);
     const pinMax = 9 * 10 ** (pinLength - 1);
     const pin = Math.floor(pinMin + Math.random() * pinMax);
-    return await this.databaseService.pinGeneration({ ...data, fecha, pin });
+    return await this.databaseRepository.pdpLogSegundaVerificacionRepository.pinGeneration(
+      { ...data, fecha, pin },
+    );
   }
 
   async pinValidation(data: {
@@ -23,6 +25,8 @@ export class AppService {
     NUMERO_RECIBIDO: number;
     ip: string;
   }) {
-    return await this.databaseService.pinValidation(data);
+    return await this.databaseRepository.pdpLogSegundaVerificacionRepository.pinValidation(
+      data,
+    );
   }
 }
