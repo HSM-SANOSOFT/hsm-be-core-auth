@@ -24,17 +24,17 @@ export class DatabaseService {
       );
       return result;
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(JSON.stringify(error));
       throw new RpcException({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: error as string,
+        message: JSON.stringify(error),
       });
     } finally {
       if (connection) {
         try {
           await connection.close();
         } catch (error) {
-          this.logger.error('Error closing connection', error);
+          this.logger.error('Error closing connection' + JSON.stringify(error));
         }
       }
     }

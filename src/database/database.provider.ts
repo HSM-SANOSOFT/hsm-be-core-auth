@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
-import { envs } from 'src/config';
 import * as oracledb from 'oracledb';
+import { envs } from 'src/config';
 
 export const databaseProviders = [
   {
@@ -26,7 +26,9 @@ export const databaseProviders = [
 
         return pool;
       } catch (error) {
-        logger.error(`Error during database initialization: ${error}`);
+        logger.error(
+          `Error during database initialization: ${JSON.stringify(error)}`,
+        );
       }
     },
   },

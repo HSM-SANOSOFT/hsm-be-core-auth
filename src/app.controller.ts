@@ -18,7 +18,7 @@ export class AppController {
     },
   ) {
     const response = await this.appService.pinGeneration(data);
-    this.logger.log(response);
+    this.logger.log('pinGeneration(): ' + JSON.stringify(response));
     return response;
   }
 
@@ -33,7 +33,7 @@ export class AppController {
     },
   ) {
     const response = await this.appService.pinValidation(data);
-    this.logger.log(response);
+    this.logger.log('pinValidation(): ' + JSON.stringify(response));
     return response;
   }
 }

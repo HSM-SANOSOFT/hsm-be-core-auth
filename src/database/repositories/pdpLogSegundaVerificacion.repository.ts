@@ -47,7 +47,7 @@ export class PdpLogSegundaVerificacionRepository {
 
     if (!ID) {
       throw new RpcException({
-        status: HttpStatus.NOT_FOUND,
+        statusCode: HttpStatus.NOT_FOUND,
         message: `Failed to generate new ID for CEDULA: ${data.idDocs}`,
       });
     }
@@ -82,7 +82,7 @@ export class PdpLogSegundaVerificacionRepository {
 
     if (!resultPin.rows?.length) {
       throw new RpcException({
-        status: HttpStatus.NOT_FOUND,
+        statusCode: HttpStatus.NOT_FOUND,
         message: `No se Encontro Pin Disponible para ID: ${data.idDocs}`,
       });
     }
@@ -105,7 +105,7 @@ export class PdpLogSegundaVerificacionRepository {
           { autoCommit: true },
         );
         throw new RpcException({
-          status: HttpStatus.FORBIDDEN,
+          statusCode: HttpStatus.FORBIDDEN,
           message: `Excedio el numero de intentos permitidos para ID: ${data.idDocs}`,
         });
       }
@@ -115,7 +115,7 @@ export class PdpLogSegundaVerificacionRepository {
         { autoCommit: true },
       );
       throw new RpcException({
-        status: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST,
         message: `PIN validation failed for ID: ${data.idDocs}, intento actual: ${intentoActual + 1}`,
       });
     }
