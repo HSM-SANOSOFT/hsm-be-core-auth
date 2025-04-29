@@ -1,0 +1,13 @@
+name: CI/CD for Microservices
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    uses: HSM-SANOSOFT/.github/.github/workflows/CICD-Microservices.yml@main
+    with:
+      MICROSERVICE_NAME: ${{ vars.MICROSERVICE_NAME}}
+      NAMESPACE: 'app'
+    secrets: 
+      GHCR_PASSWORD: ${{ secrets.GHCR_PASSWORD }}
